@@ -1,28 +1,41 @@
-// Your code here.
- let isDragging = false;
- let offsetX, offsetY;
+const items = document.querySelectorAll('.item');
+let offsetX, offsetY, isDragging = false;
 
-        document.querySelectorAll('.item').forEach(item => {
-            item.addEventListener('mousedown', startDragging);
-            item.addEventListener('mousemove', drag);
-            item.addEventListener('mouseup', stopDragging);
-        });
+items.forEach(item => {
+  item.addEventListener('mousedown', (event) => {
+    offsetX = event.clientX - item.getBoundingClientRect().left;
+    offsetY = event.clientY - item.getBoundingClientRect().top;
+    isDragging = true;
 
-        function startDragging(event) {
-            isDragging = true;
-            let rect = event.target.getBoundingClientRect();
-            offsetX = event.clientX - rect.left;
-            offsetY = event.clientY - rect.top;
-        }
+    // Set item styles while dragging
+    item.style.position = 'absolute';
+    item.style.zIndex = 1000;
 
-        function drag(event) {
-            if (isDragging) {
-                let x = event.clientX - offsetX;
-                let y = event.clientY - offsetY;
-                event.target.style.transform = `translate(${x}px, ${y}px)`;
-            }
-        }
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 
-        function stopDragging() {
-            isDragging = false;
-        }
+  function onMouseMove(event) {
+    if (isDragging) {
+      const x = event.clientX - offsetX;
+      const y = event.clientY - offsetY;
+
+      // Update item position
+      item.style.left = x + 'px';
+      item.style.top = y + 'px';
+    }
+  }
+
+  function onMouseUp() {
+    if (isDragging) {
+      // Reset styles after dragging
+      item.style.position = '';
+      item.style.zIndex = '';
+      isDragging = false;
+
+      // Remove event listeners
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+  }
+});
