@@ -1,41 +1,26 @@
-const items = document.querySelectorAll('.item');
-let offsetX, offsetY, isDragging = false;
+const items = document.querySelector('.items');
+let isMouseDown = false;
+let startX;
+let scrollLeft;
 
-items.forEach(item => {
-  item.addEventListener('mousedown', (event) => {
-    offsetX = event.clientX - item.getBoundingClientRect().left;
-    offsetY = event.clientY - item.getBoundingClientRect().top;
-    isDragging = true;
+items.addEventListener('mousedown', (e) => {
+    isMouseDown = true;
+    startX = e.pageX - items.offsetLeft;
+    scrollLeft = items.scrollLeft;
+});
 
-    // Set item styles while dragging
-    item.style.position = 'absolute';
-    item.style.zIndex = 1000;
+items.addEventListener('mouseleave', () => {
+    isMouseDown = false;
+});
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
+items.addEventListener('mouseup', () => {
+    isMouseDown = false;
+});
 
-  function onMouseMove(event) {
-    if (isDragging) {
-      const x = event.clientX - offsetX;
-      const y = event.clientY - offsetY;
-
-      // Update item position
-      item.style.left = x + 'px';
-      item.style.top = y + 'px';
-    }
-  }
-
-  function onMouseUp() {
-    if (isDragging) {
-      // Reset styles after dragging
-      item.style.position = '';
-      item.style.zIndex = '';
-      isDragging = false;
-
-      // Remove event listeners
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
-  }
+items.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    e.preventDefault();
+    const x = e.pageX - items.offsetLeft;
+    const walk = (x - startX) * 2;
+    items.scrollLeft = scrollLeft - walk;
 });
